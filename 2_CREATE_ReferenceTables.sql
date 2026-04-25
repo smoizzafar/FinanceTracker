@@ -1,6 +1,6 @@
-/*using VARCHAR on CategoryDescription and 
-MerchantDescription as these tables will 
-be populated in plain english only */
+/*using VARCHAR on CategoryDescription, 
+MerchantDescription, and typeDescription as 
+these tables will be populated in plain english only */
 
 CREATE TABLE Categories (
 CategoryID INT IDENTITY(1,1)
@@ -12,4 +12,10 @@ CREATE TABLE Merchants(
 MerchantID INT IDENTITY(1,1)
 	CONSTRAINT PK_Merchants PRIMARY KEY,
 MerchantDescription VARCHAR(100) NOT NULL
+)
+
+CREATE TABLE TransactionTypes (
+	TypeID INT IDENTITY(1, 1)
+		CONSTRAINT PK_TransactionTypes PRIMARY KEY,
+	TypeDescription VARCHAR(100) NOT NULL
 )

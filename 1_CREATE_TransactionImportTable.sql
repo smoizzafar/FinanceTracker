@@ -7,4 +7,5 @@ TransactionDescription NVARCHAR(200) NOT NULL,
 RunningBalance MONEY NOT NULL,
 ImportedDate DATETIME DEFAULT (GETDATE()) NOT NULL,
 	CONSTRAINT UQ_TransactionImportTable UNIQUE (TransactionDate, TransactionAmount, TransactionDescription, RunningBalance)
+    --Unique constarint on 4 columns prevents duplication during import
 )
