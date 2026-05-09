@@ -31,7 +31,7 @@ BEGIN
 	SELECT DISTINCT MerchantName FROM 
 	(SELECT
 	CASE
-		WHEN TransactionDescription LIKE '%NS AUS%' THEN SUBSTRING(TransactionDescription, 0, (CHARINDEX('NS AUS', TransactionDescription))-1)
+		WHEN TransactionDescription LIKE '%Card xx%' THEN SUBSTRING(TransactionDescription, 0, (CHARINDEX('Card xx', TransactionDescription))-1)
 		ELSE NULL
 	END AS MerchantName
 	FROM Transactions
@@ -44,7 +44,7 @@ BEGIN
 	SET MerchantID = m.MerchantID
 	FROM Transactions t
 	INNER JOIN Merchants m
-	on m.MerchantDescription =  RTRIM(SUBSTRING(TransactionDescription, 0, (CHARINDEX('NS AUS', TransactionDescription))))
+	on m.MerchantDescription =  RTRIM(SUBSTRING(TransactionDescription, 0, (CHARINDEX('Card xx', TransactionDescription))))
 	WHERE TransactionID > @NewTransactions
 
 END
