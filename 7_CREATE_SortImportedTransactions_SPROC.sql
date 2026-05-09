@@ -2,8 +2,13 @@ CREATE PROCEDURE SortImportedTransactions
 AS
 BEGIN
     SET NOCOUNT ON;
+
     DECLARE @ImportID INT;
-    SELECT @ImportID = LastImportID FROM ImportTracker;
+	DECLARE @NewTransactions INT;
+
+	SELECT @NewTransactions = ISNULL(MAX(TransactionID), 0) FROM dbo.Transactions;
+    SELECT @ImportID = ISNULL(LastImportID, 0) FROM ImportTracker;
+
     INSERT INTO [FinanceTracker].[dbo].[Transactions] (Amount, TransactionDate, TransactionTypeID, TransactionDescription, LastChangedDate)
     SELECT
     TransactionAmount,
@@ -20,4 +25,26 @@ BEGIN
     WHERE ImportID > @ImportID;
     UPDATE ImportTracker
     SET LastImportID = (SELECT MAX(ImportID) FROM TransactionImportTable);
+
+	--Classify and add new merchants
+	INSERT INTO Merchants(MerchantDescription)
+	SELECT DISTINCT MerchantName FROM 
+	(SELECT
+	CASE
+		WHEN TransactionDescription LIKE '%NS AUS%' THEN SUBSTRING(TransactionDescription, 0, (CHARINDEX('NS AUS', TransactionDescription))-1)
+		ELSE NULL
+	END AS MerchantName
+	FROM Transactions
+	WHERE TransactionID > @NewTransactions) mn
+	WHERE MerchantName IS NOT NULL
+	AND NOT EXISTS (
+		SELECT 1 FROM Merchants WHERE MerchantName = mn.MerchantName)
+
+	UPDATE t
+	SET MerchantID = m.MerchantID
+	FROM Transactions t
+	INNER JOIN Merchants m
+	on m.MerchantDescription =  RTRIM(SUBSTRING(TransactionDescription, 0, (CHARINDEX('NS AUS', TransactionDescription))))
+	WHERE TransactionID > @NewTransactions
+
 END
